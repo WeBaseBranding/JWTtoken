@@ -7,9 +7,13 @@ const auth = require('../middleware/auth');
 
 // @route POST /register
 router.post('/register', async (req, res) => {
-  const { name, email, password } = req.body;
-
   try {
+    const { name, email, password } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ msg: 'All fields are required' });
+    }
+
     let user = await User.findOne({ email });
     if (user) return res.status(400).json({ msg: 'User already exists' });
 
@@ -23,9 +27,11 @@ router.post('/register', async (req, res) => {
 
     res.json({ token });
   } catch (err) {
-    res.status(500).send('Server Error');
+    console.error("🔥 Register Error:", err.message); // Add this line
+    res.status(500).json({ msg: 'Server Error', error: err.message }); // Add error details
   }
 });
+
 
 // @route POST /login
 router.post('/login', async (req, res) => {
